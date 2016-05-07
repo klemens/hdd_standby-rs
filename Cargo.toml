@@ -3,5 +3,9 @@ name = "hdd_status"
 version = "0.1.0"
 authors = ["Klemens Schölhorn <klemens@schoelhorn.eu>"]
 
+[[bin]]
+name = "hdd-status"
+path = "src/cli.rs"
+
 [dependencies]
 libc = "*"
