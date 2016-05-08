@@ -1,10 +1,10 @@
 [package]
-name = "hdd_status"
+name = "hdd_standby"
 version = "0.1.0"
 authors = ["Klemens Schölhorn <klemens@schoelhorn.eu>"]
 
 [[bin]]
-name = "hdd-status"
+name = "hdd-standby"
 path = "src/cli.rs"
 
 [dependencies]

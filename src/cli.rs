@@ -1,6 +1,6 @@
-extern crate hdd_status;
+extern crate hdd_standby;
 
-use hdd_status::{Error, PowerMode};
+use hdd_standby::{Error, PowerState};
 use std::io::{self, Write};
 use std::process::exit;
 
@@ -27,7 +27,7 @@ fn main() {
         exit(101);
     };
 
-    exit(match hdd_status::get_power_mode(&path) {
+    exit(match hdd_standby::get_power_state(&path) {
         Err(Error::NoAccess) => {
             print_error(quiet, "Cannot open device file");
             102
