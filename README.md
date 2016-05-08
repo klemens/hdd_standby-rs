@@ -2,7 +2,7 @@
 
 [Documentation](https://klemens.github.io/hdd_standby-rs/hdd_standby/)
 
-Libray to check the power state of a hdd using ioctls. Currently only
+Library to check the power state of a hdd using ioctls. Currently only
 supported on unix.
 
 # Example

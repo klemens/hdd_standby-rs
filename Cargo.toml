@@ -3,10 +3,17 @@ name = "hdd_standby"
 version = "0.1.0"
 authors = ["Klemens Schölhorn <klemens@schoelhorn.eu>"]
 
+description = "Library to check the power state of a hdd"
+license = "MIT"
+readme = "README.md"
+
+documentation = "https://klemens.github.io/hdd_standby-rs/hdd_standby/"
+repository = "https://github.com/klemens/hdd_standby-rs"
+
 [[bin]]
 name = "hdd-standby"
 path = "src/cli.rs"
 doc = false
 
 [dependencies]
-libc = "*"
+libc = "0.2"

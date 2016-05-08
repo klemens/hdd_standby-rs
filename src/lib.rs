@@ -1,4 +1,4 @@
-//! Libray to check the power state of a hdd
+//! Library to check the power state of a hdd
 //!
 //! This library allows querying the power status of an ata device using the
 //! ioctl syscall and is therefore currently only supported on unix systems.
