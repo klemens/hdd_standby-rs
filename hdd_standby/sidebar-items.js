@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","The error type for this crate"],["PowerState","The power state of an ata device"]],"fn":[["get_power_state","Query the power status of the given device"]]});
