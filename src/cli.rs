@@ -39,10 +39,9 @@ fn main() {
         Ok(mode) => {
             if ! quiet { println!("{}: {:?}", path, mode); }
             match mode {
-                PowerMode::Active | PowerMode::Idle => 0,
-                PowerMode::Spindown | PowerMode::Spinup => 2,
-                PowerMode::Standby => 1,
-                PowerMode::Unknown => 3,
+                PowerState::Active | PowerState::Idle => 0,
+                PowerState::Standby => 1,
+                PowerState::Unknown => 2,
             }
         }
     });

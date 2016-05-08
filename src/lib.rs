@@ -3,12 +3,14 @@ extern crate libc;
 use std::ffi::CString;
 
 #[derive(Debug)]
-pub enum PowerMode {
+pub enum PowerState {
+    /// The hdd is in the standby state (PM2, usually spun down)
     Standby,
-    Spindown,
-    Spinup,
+    /// The hdd is in the idle state (PM1)
     Idle,
+    /// The hdd is in the active or idle state (PM0 or PM1)
     Active,
+    /// The state of the hdd is unknown (invalid ATA response)
     Unknown,
 }
 
@@ -19,34 +21,33 @@ pub enum Error {
 }
 
 // Ioctl for special hdd commands
-const HDIO_DRIVE_CMD: libc::c_ulong = 0x031F;
+const IOCTL_DRIVE_CMD: libc::c_ulong = 0x031F;
 
-// Hdd commands to check the power mode (taken from hdparm)
-const ATA_OP_CHECKPOWERMODE1: libc::c_uchar = 0xE5;
-const ATA_OP_CHECKPOWERMODE2: libc::c_uchar = 0x98;
+// Ata commands to check the power state
+const ATA_CHECKPOWERMODE: libc::c_uchar = 0xE5;
+const ATA_CHECKPOWERMODE_RETIRED: libc::c_uchar = 0x98;
 
-pub fn get_power_mode(path: &str) -> Result<PowerMode, Error> {
+pub fn get_power_state(path: &str) -> Result<PowerState, Error> {
     let device = try!(DeviceWrapper::open(path));
 
     let mut query: [libc::c_uchar; 4] = [0; 4];
 
     unsafe {
-        query[0] = ATA_OP_CHECKPOWERMODE1;
-        if libc::ioctl(device.fd(), HDIO_DRIVE_CMD, query.as_mut_ptr()) != 0 {
-            query[0] = ATA_OP_CHECKPOWERMODE2;
-            if libc::ioctl(device.fd(), HDIO_DRIVE_CMD, query.as_mut_ptr()) != 0 {
+        query[0] = ATA_CHECKPOWERMODE;
+        if libc::ioctl(device.fd(), IOCTL_DRIVE_CMD, query.as_mut_ptr()) != 0 {
+            // Try the retired command if the current one failed
+            query[0] = ATA_CHECKPOWERMODE_RETIRED;
+            if libc::ioctl(device.fd(), IOCTL_DRIVE_CMD, query.as_mut_ptr()) != 0 {
                 return Err(Error::InvalidDeviceFile)
             }
         }
     }
 
     Ok(match query[2] {
-        0x00 => PowerMode::Standby,
-        0x40 => PowerMode::Spindown,
-        0x41 => PowerMode::Spinup,
-        0x80 => PowerMode::Idle,
-        0xFF => PowerMode::Active,
-        _    => PowerMode::Unknown
+        0x00 ... 0x01 => PowerState::Standby,
+        0x80 ... 0x83 => PowerState::Idle,
+        0xFF => PowerState::Active,
+        _    => PowerState::Unknown
     })
 }
 
