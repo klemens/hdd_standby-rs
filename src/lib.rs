@@ -1,6 +1,5 @@
 extern crate libc;
 
-use std::ffi::CString;
 
 #[derive(Debug)]
 pub enum PowerState {
@@ -55,7 +54,7 @@ struct DeviceWrapper(libc::c_int);
 
 impl DeviceWrapper {
     pub fn open(path: &str) -> Result<DeviceWrapper, Error> {
-        let path = CString::new(path).unwrap();
+        let path = std::ffi::CString::new(path).unwrap();
 
         let fd = unsafe {
             libc::open(path.as_ptr(), libc::O_RDONLY | libc::O_NONBLOCK)
