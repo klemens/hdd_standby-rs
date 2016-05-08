@@ -6,6 +6,7 @@ authors = ["Klemens Schölhorn <klemens@schoelhorn.eu>"]
 [[bin]]
 name = "hdd-standby"
 path = "src/cli.rs"
+doc = false
 
 [dependencies]
 libc = "*"
