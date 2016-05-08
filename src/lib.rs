@@ -1,6 +1,18 @@
+//! Libray to check the power state of a hdd
+//!
+//! This library allows querying the power status of an ata device using the
+//! ioctl syscall and is therefore currently only supported on unix systems.
+//! Querying a spun down drive will *not* cause a spinup.
+//!
+//! The necessary ATA constants were taken from the [ACS-3] draft standard.
+//!
+//! [ACS-3]: http://www.t13.org/Documents/UploadedDocuments/docs2013/d2161r5-ATAATAPI_Command_Set_-_3.pdf
+
+#![deny(missing_docs)]
+
 extern crate libc;
 
-
+/// The power state of an ata device
 #[derive(Debug)]
 pub enum PowerState {
     /// The hdd is in the standby state (PM2, usually spun down)
@@ -13,9 +25,12 @@ pub enum PowerState {
     Unknown,
 }
 
+/// The error type for this crate
 #[derive(Debug)]
 pub enum Error {
+    /// The device file could not be opened (nonexistent or insufficient rights)
     NoAccess,
+    /// The given file is no special device file
     InvalidDeviceFile,
 }
 
@@ -26,6 +41,18 @@ const IOCTL_DRIVE_CMD: libc::c_ulong = 0x031F;
 const ATA_CHECKPOWERMODE: libc::c_uchar = 0xE5;
 const ATA_CHECKPOWERMODE_RETIRED: libc::c_uchar = 0x98;
 
+/// Query the power status of the given device
+///
+/// You must have the necessary rights to open the device file in read only
+/// mode, otherwise `Error::NoAccess` will be returned.
+///
+/// # Example
+///
+/// ```
+/// # use hdd_standby::*;
+/// let status = get_power_state("/dev/sda");
+/// println!("{:?}", status.unwrap_or(PowerState::Unknown));
+/// ```
 pub fn get_power_state(path: &str) -> Result<PowerState, Error> {
     let device = try!(DeviceWrapper::open(path));
 
@@ -50,6 +77,7 @@ pub fn get_power_state(path: &str) -> Result<PowerState, Error> {
     })
 }
 
+// Wraps a device file descriptor that is automatically closed
 struct DeviceWrapper(libc::c_int);
 
 impl DeviceWrapper {
